@@ -1,0 +1,7 @@
+__pycache__/
+*.pyc
+.DS_Store
+# personal settings (your name, last IP you joined)
+lastlight_config.json
+# made by: python3 main.py --export-art
+art_export/

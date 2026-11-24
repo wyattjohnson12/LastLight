@@ -1,0 +1,280 @@
+# ----------------------------------------------------------------- window / world
+SCREEN_WIDTH = 1100
+SCREEN_HEIGHT = 720
+SCREEN_TITLE = "Last Light - Survive the Night"
+WORLD_SIZE = 3200          # the surface map is WORLD_SIZE x WORLD_SIZE pixels
+CAVE_SIZE = 2400           # the underground map
+CAVE_CELL = 60             # cave walls are built from cells this big
+CAVE_ENTRANCES = 3
+GRID = 40                  # building snap grid
+
+# ----------------------------------------------------------------- player
+PLAYER_SPEED = 210         # pixels per second
+TIRED_SPEED = 110          # speed when energy is empty
+STAT_MAX = 100
+
+HUNGER_DECAY_PER_SEC = 0.55
+THIRST_DECAY_PER_SEC = 0.8
+ENERGY_DECAY_PER_SEC = 0.9      # while walking
+SWING_ENERGY_COST = 1.2
+REST_RESTORE_PER_SEC = 12.0     # hold SHIFT
+STARVE_DAMAGE_PER_SEC = 2.5
+THIRST_DAMAGE_PER_SEC = 3.5
+NATURAL_REGEN_PER_SEC = 0.6     # when hunger & thirst are above half
+DAY_RESPAWN_SECONDS = 8         # die by day -> back after this long. Die at night -> back at dawn.
+
+# ----------------------------------------------------------------- temperature
+COLD_PER_SEC = 2.6              # warmth lost per second in full night with no clothes
+CAVE_COLD_PER_SEC = 0.9         # caves are always chilly
+WARMTH_PER_GEAR_POINT = 0.2     # each point of clothing warmth cancels this much cold
+FIRE_WARM_PER_SEC = 7.0         # standing near a campfire / brazier
+HUT_WARM_PER_SEC = 3.5
+DAY_WARM_PER_SEC = 4.0
+TORCH_WARM_PER_SEC = 1.3
+FREEZE_DAMAGE_PER_SEC = 2.5     # when warmth hits 0
+FIRE_WARM_RADIUS = 170
+
+# ----------------------------------------------------------------- day / night
+DAY_CYCLE_SECONDS = 180    # one full day + night
+START_PHASE = 0.05         # start just after dawn
+DUSK_START, NIGHT_START, DAWN_START = 0.55, 0.65, 0.90
+BOSS_EVERY = 3             # a boss rises on night 3, 6, 9, ...
+
+# ----------------------------------------------------------------- enemies
+ZOMBIES = {
+    #             hp   speed  damage  attack_every
+    "walker":    (6,   72,    9,      1.0),
+    "runner":    (4,   128,   7,      0.8),
+    "brute":     (20,  52,    18,     1.4),
+    "broodling": (3,   150,   5,      0.7),   # summoned by the Brood Mother
+    "crawler":   (5,   140,   7,      0.8),   # underground
+    "golem":     (30,  46,    20,     1.5),   # underground, drops crystal & iron
+}
+SUN_BURN_PER_SEC = 2.5     # zombies burn in daylight
+FIRE_FEAR_RADIUS = 110     # walkers and runners avoid campfires
+
+# ----------------------------------------------------------------- animals
+# hp, speed, temper (flee | defend), drops, tame food (None = can't tame), pet job
+ANIMALS = {
+    "rabbit": {"hp": 2, "speed": 170, "temper": "flee", "drops": {"meat": 1, "hide": 1},
+               "tame": "berries", "chance": 0.6, "job": "forager", "dmg": 0,
+               "desc": "Forager: picks berries & fiber from bushes and hauls them home."},
+    "deer": {"hp": 6, "speed": 195, "temper": "flee", "drops": {"meat": 3, "hide": 2},
+             "tame": None, "chance": 0, "job": None, "dmg": 0, "desc": ""},
+    "boar": {"hp": 10, "speed": 115, "temper": "defend", "drops": {"meat": 3, "hide": 1},
+             "tame": "berries", "chance": 0.35, "job": "hauler", "dmg": 8,
+             "desc": "Hauler: chops trees and breaks rocks, carries wood & stone home."},
+    "wolf": {"hp": 12, "speed": 165, "temper": "defend", "drops": {"meat": 1, "fur": 2},
+             "tame": "meat", "chance": 0.3, "job": "guard", "dmg": 6,
+             "desc": "Guard: fights zombies next to you (or around your base)."},
+    "bee": {"hp": 1, "speed": 120, "temper": "defend", "drops": {}, "flies": True,
+            "tame": "honey", "chance": 0.5, "job": "beekeeper", "dmg": 3,
+            "desc": "Honey bee: on WORK it buzzes between flowers and brings honey to your Storage Bins."},
+}
+ANIMAL_CAP = 26
+MAX_PETS = 3
+PET_CARRY = 6
+
+# ----------------------------------------------------------------- bees & honey
+HIVE_COUNT = 24            # beehives hanging in surface trees
+HIVE_REGROW = 75           # seconds for a raided hive to fill with honey again
+HIVE_HONEY = 2             # honey you get from raiding a full hive
+HIVE_ALERT_RADIUS = 220    # wild bees this close get angry when you raid their hive
+BEE_HONEY_EVERY = 5.0      # seconds a working pet bee spends at a flower per honey
+BEE_CARRY = 3              # honey a pet bee brings home per trip
+
+# ----------------------------------------------------------------- bosses
+# name, hp, speed, melee damage, size, intro lines, drops
+BOSSES = {
+    "titan": {"name": "THE QUAKE TITAN", "hp": 220, "speed": 55, "damage": 30, "radius": 52,
+              "tag": "The ground itself is its weapon.",
+              "moves": ["EARTHQUAKE - stomps send a shockwave out from it. Get far away or get hit.",
+                        "BOULDER TOSS - hurls rocks. Move out of the red circles.",
+                        "WALL BREAKER - smashes through anything you build."],
+              "drops": {"titan_core": 2, "stone": 15, "iron_ore": 4}},
+    "brood": {"name": "THE BROOD MOTHER", "hp": 240, "speed": 80, "damage": 18, "radius": 48,
+              "tag": "She never comes alone.",
+              "moves": ["BROOD - keeps hatching fast little broodlings. Thin them out.",
+                        "ACID SPIT - globs leave burning pools. Don't stand in green.",
+                        "Kill the mother and the swarm stops."],
+              "drops": {"chitin": 6, "meat": 4, "fiber": 8}},
+    "wraith": {"name": "THE FROST WRAITH", "hp": 260, "speed": 95, "damage": 16, "radius": 42,
+               "tag": "It drinks the warmth from the world.",
+               "moves": ["BLIZZARD - the night gets brutally cold. Fires near it go out.",
+                         "ICE SHARDS - bursts of shards fly out in every direction.",
+                         "BLINK - it vanishes and reappears behind you. Walls can't stop it."],
+               "drops": {"frost_shard": 4, "crystal": 2}},
+    "colossus": {"name": "THE INFERNO COLOSSUS", "hp": 320, "speed": 70, "damage": 26, "radius": 56,
+                 "tag": "Everything it touches burns.",
+                 "moves": ["FIRE TRAIL - leaves burning ground wherever it walks.",
+                           "METEOR RAIN - flaming rocks fall on the red circles.",
+                           "CHARGE - watch for the glowing line, then dive sideways."],
+                 "drops": {"ember_heart": 2, "iron_ore": 6, "coal": 6}},
+}
+BOSS_ORDER = ["titan", "brood", "wraith", "colossus"]
+
+# ----------------------------------------------------------------- items
+# kind: material | food | weapon | tool | build | armor
+ITEMS = {
+    # --- basic materials
+    "wood":    {"name": "Wood", "kind": "material", "desc": "Chop trees. Used for almost everything."},
+    "stone":   {"name": "Stone", "kind": "material", "desc": "Mine rocks. Tools, walls and fire rings."},
+    "fiber":   {"name": "Plant Fiber", "kind": "material", "desc": "From bushes. Bandages, rope, clothing."},
+    "hide":    {"name": "Raw Hide", "kind": "material", "desc": "From hunted animals. Tan it into leather at a workbench."},
+    "leather": {"name": "Leather", "kind": "material", "desc": "Armor, clothing and grips."},
+    "fur":     {"name": "Wolf Fur", "kind": "material", "desc": "Warm! Makes cloaks for cold nights."},
+    "iron_ore": {"name": "Iron Ore", "kind": "material", "desc": "Rusty rocks on the surface, rich veins underground. Needs a pickaxe."},
+    "coal":    {"name": "Coal", "kind": "material", "desc": "Found underground. Fuel for the furnace and braziers."},
+    "iron_ingot": {"name": "Iron Ingot", "kind": "material", "desc": "Smelted in a furnace. Iron tools, armor and walls."},
+    "crystal": {"name": "Cave Crystal", "kind": "material", "desc": "Deep underground. Needs an iron pickaxe."},
+    "titan_core": {"name": "Titan Core", "kind": "material", "desc": "Dropped by the Quake Titan. Still rumbling."},
+    "chitin":  {"name": "Brood Chitin", "kind": "material", "desc": "Dropped by the Brood Mother. Light and tough."},
+    "frost_shard": {"name": "Frost Shard", "kind": "material", "desc": "Dropped by the Frost Wraith. Never melts."},
+    "ember_heart": {"name": "Ember Heart", "kind": "material", "desc": "Dropped by the Inferno Colossus. Hot to the touch."},
+    # --- food & healing
+    "berries": {"name": "Berries", "kind": "food", "hunger": 14, "thirst": 3,
+                "desc": "Quick snack. +14 hunger. Rabbits and boars love them (taming)."},
+    "water":   {"name": "Water Flask", "kind": "food", "thirst": 35, "desc": "Fill at a pond with E. +35 thirst."},
+    "meat":    {"name": "Raw Meat", "kind": "food", "hunger": 10, "health": -4,
+                "desc": "Cook it at a campfire! Wolves can be tamed with it."},
+    "cooked_meat": {"name": "Cooked Meat", "kind": "food", "hunger": 45, "health": 8, "desc": "+45 hunger, +8 health."},
+    "stew":    {"name": "Berry Stew", "kind": "food", "hunger": 50, "health": 12,
+                "desc": "Cooked at a campfire. +50 hunger, +12 health."},
+    "honey":   {"name": "Honey", "kind": "food", "hunger": 8, "energy": 50, "health": 4,
+                "desc": "Sweet energy! +50 energy, +8 hunger. Raid beehives in trees. Bees can be tamed with it."},
+    "bandage": {"name": "Bandage", "kind": "food", "health": 30, "desc": "Patch yourself up. +30 health."},
+    "medkit":  {"name": "Crystal Medkit", "kind": "food", "health": 80, "desc": "+80 health. Glows faintly."},
+    # --- weapons & tools
+    "club":    {"name": "Wooden Club", "kind": "weapon", "damage": 2.5, "reach": 58, "cooldown": 0.45,
+                "desc": "Bonk. 2.5 damage."},
+    "spear":   {"name": "Stone Spear", "kind": "weapon", "damage": 4, "reach": 86, "cooldown": 0.55,
+                "desc": "Long reach. 4 damage."},
+    "axe":     {"name": "Stone Axe", "kind": "tool", "damage": 2, "reach": 56, "cooldown": 0.42,
+                "harvest": {"tree": 2}, "desc": "Double wood from trees."},
+    "pickaxe": {"name": "Stone Pickaxe", "kind": "tool", "damage": 1.5, "reach": 56, "cooldown": 0.42,
+                "harvest": {"rock": 2, "iron": 1, "coal": 1}, "desc": "Double stone. Can mine iron and coal."},
+    "torch":   {"name": "Torch", "kind": "tool", "damage": 1.5, "reach": 52, "cooldown": 0.45, "light": 1,
+                "desc": "Hold it for a bigger circle of light and a little warmth."},
+    "iron_axe": {"name": "Iron Axe", "kind": "tool", "damage": 3.5, "reach": 60, "cooldown": 0.38,
+                 "harvest": {"tree": 3}, "desc": "Triple wood. Decent weapon too."},
+    "iron_pickaxe": {"name": "Iron Pickaxe", "kind": "tool", "damage": 3, "reach": 60, "cooldown": 0.38,
+                     "harvest": {"rock": 3, "iron": 2, "coal": 2, "crystal": 1},
+                     "desc": "Fast mining. The only thing that can break crystal."},
+    "iron_sword": {"name": "Iron Sword", "kind": "weapon", "damage": 6, "reach": 70, "cooldown": 0.4,
+                   "desc": "6 damage, quick swings."},
+    "frost_spear": {"name": "Frost Spear", "kind": "weapon", "damage": 7, "reach": 104, "cooldown": 0.5,
+                    "slow": 1, "desc": "7 damage, huge reach. Chills enemies so they slow down."},
+    "titan_hammer": {"name": "Titan Hammer", "kind": "weapon", "damage": 12, "reach": 76, "cooldown": 0.9,
+                     "quake": 1, "desc": "12 damage to EVERYTHING around you. Slow but devastating."},
+    "ember_blade": {"name": "Ember Blade", "kind": "weapon", "damage": 9, "reach": 74, "cooldown": 0.36,
+                    "burn": 1, "desc": "9 damage and sets enemies on fire."},
+    # --- armor & clothing (slot: head | body | cloak)
+    "leather_cap":   {"name": "Leather Cap", "kind": "armor", "slot": "head", "armor": 1, "warmth": 1,
+                      "desc": "Armor 1, warmth 1."},
+    "leather_tunic": {"name": "Leather Tunic", "kind": "armor", "slot": "body", "armor": 2, "warmth": 3,
+                      "desc": "Armor 2, warmth 3."},
+    "fur_cloak":     {"name": "Fur Cloak", "kind": "armor", "slot": "cloak", "armor": 0, "warmth": 7,
+                      "desc": "Warmth 7. Nights are a lot less scary."},
+    "iron_helmet":   {"name": "Iron Helmet", "kind": "armor", "slot": "head", "armor": 3, "warmth": 0,
+                      "desc": "Armor 3."},
+    "iron_armor":    {"name": "Iron Armor", "kind": "armor", "slot": "body", "armor": 5, "warmth": 0,
+                      "desc": "Armor 5. Cold metal - wear a cloak."},
+    "chitin_armor":  {"name": "Chitin Armor", "kind": "armor", "slot": "body", "armor": 7, "warmth": 2,
+                      "desc": "Armor 7, warmth 2."},
+    "frost_cloak":   {"name": "Frost Cloak", "kind": "armor", "slot": "cloak", "armor": 2, "warmth": 14,
+                      "desc": "Armor 2, warmth 14. You'll never be cold again."},
+    "titan_plate":   {"name": "Titan Plate", "kind": "armor", "slot": "body", "armor": 10, "warmth": 2,
+                      "desc": "Armor 10, warmth 2. The best protection there is."},
+    # --- buildings
+    "wood_wall":  {"name": "Wood Wall", "kind": "build", "hp": 45, "desc": "Blocks zombies. Right-click to place."},
+    "stone_wall": {"name": "Stone Wall", "kind": "build", "hp": 120, "desc": "Tough wall."},
+    "iron_wall":  {"name": "Iron Wall", "kind": "build", "hp": 280, "desc": "Very tough wall."},
+    "spike_trap": {"name": "Spike Trap", "kind": "build", "hp": 24, "desc": "Hurts zombies that walk over it."},
+    "campfire":   {"name": "Campfire", "kind": "build", "hp": 60,
+                   "desc": "Light and warmth. Scares walkers. Cook food. Rest here to heal."},
+    "brazier":    {"name": "Iron Brazier", "kind": "build", "hp": 160,
+                   "desc": "A sturdier fire: big light, lots of warmth, scares zombies."},
+    "hut":        {"name": "Hut", "kind": "build", "hp": 220,
+                   "desc": "Shelter. Zombies can't reach you inside. Warm. You respawn at huts."},
+    "workbench":  {"name": "Workbench", "kind": "build", "hp": 80,
+                   "desc": "Stand near it for ADVANCED crafting: leather, armor, iron gear."},
+    "furnace":    {"name": "Furnace", "kind": "build", "hp": 140, "desc": "Smelts iron ore into ingots."},
+    "storage":    {"name": "Storage Bin", "kind": "build", "hp": 160,
+                   "desc": "TEAM storage, shared by everyone. Safe when you die. Craft straight out of it."},
+}
+HANDS = {"name": "Fists", "damage": 1, "reach": 50, "cooldown": 0.40}
+ARMOR_SLOTS = ["head", "body", "cloak"]
+LIGHT_SOURCES = ("campfire", "brazier")
+STATIONS = {"workbench": "Workbench", "furnace": "Furnace", "campfire": "Campfire"}
+
+# what each resource node gives, its hp and whether it needs a pickaxe
+NODES = {
+    "tree":    {"gives": "wood", "hp": 6, "regrow": 90},
+    "rock":    {"gives": "stone", "hp": 6, "regrow": 120},
+    "bush":    {"gives": "berries", "hp": 1, "regrow": 45},
+    "hive":    {"gives": "honey", "hp": 1, "regrow": 75},
+    "iron":    {"gives": "iron_ore", "hp": 8, "regrow": 200, "needs": "pickaxe"},
+    "coal":    {"gives": "coal", "hp": 6, "regrow": 160, "needs": "pickaxe"},
+    "crystal": {"gives": "crystal", "hp": 10, "regrow": 260, "needs": "iron_pickaxe"},
+}
+
+# crafting: item, cost, station needed (None = anywhere), menu tab, how many you get
+def R(item, cost, at=None, n=1):
+    return {"item": item, "cost": cost, "at": at, "n": n}
+
+
+CRAFT_TABS = {
+    "Tools": [
+        R("club", {"wood": 4}),
+        R("axe", {"wood": 3, "stone": 3}),
+        R("pickaxe", {"wood": 3, "stone": 3}),
+        R("spear", {"wood": 5, "stone": 4, "fiber": 2}),
+        R("torch", {"wood": 2, "fiber": 2}),
+        R("iron_axe", {"wood": 2, "iron_ingot": 3}, "workbench"),
+        R("iron_pickaxe", {"wood": 2, "iron_ingot": 3}, "workbench"),
+        R("iron_sword", {"wood": 1, "iron_ingot": 4, "leather": 1}, "workbench"),
+        R("frost_spear", {"wood": 3, "iron_ingot": 2, "frost_shard": 2}, "workbench"),
+        R("titan_hammer", {"iron_ingot": 5, "titan_core": 1, "leather": 2}, "workbench"),
+        R("ember_blade", {"iron_ingot": 4, "ember_heart": 1, "crystal": 2}, "workbench"),
+    ],
+    "Armor": [
+        R("leather_cap", {"leather": 2, "fiber": 2}, "workbench"),
+        R("leather_tunic", {"leather": 4, "fiber": 3}, "workbench"),
+        R("fur_cloak", {"fur": 4, "leather": 1, "fiber": 2}, "workbench"),
+        R("iron_helmet", {"iron_ingot": 3, "leather": 1}, "workbench"),
+        R("iron_armor", {"iron_ingot": 6, "leather": 2}, "workbench"),
+        R("chitin_armor", {"chitin": 4, "leather": 2, "iron_ingot": 2}, "workbench"),
+        R("frost_cloak", {"frost_shard": 3, "fur": 4, "crystal": 1}, "workbench"),
+        R("titan_plate", {"titan_core": 1, "iron_ingot": 8, "crystal": 2}, "workbench"),
+    ],
+    "Build": [
+        R("campfire", {"wood": 5, "stone": 3}),
+        R("wood_wall", {"wood": 3}),
+        R("spike_trap", {"wood": 3, "stone": 2}),
+        R("workbench", {"wood": 12, "stone": 6}),
+        R("storage", {"wood": 10, "fiber": 4}),
+        R("stone_wall", {"stone": 4, "wood": 1}, "workbench"),
+        R("hut", {"wood": 20, "stone": 10, "fiber": 6}, "workbench"),
+        R("furnace", {"stone": 16, "wood": 4}, "workbench"),
+        R("iron_wall", {"iron_ingot": 2, "stone": 2}, "workbench"),
+        R("brazier", {"iron_ingot": 2, "coal": 3, "stone": 4}, "workbench"),
+    ],
+    "Supplies": [
+        R("bandage", {"fiber": 3}),
+        R("stew", {"berries": 3, "water": 1}, "campfire"),
+        R("cooked_meat", {"meat": 1}, "campfire"),
+        R("leather", {"hide": 2}, "workbench"),
+        R("iron_ingot", {"iron_ore": 2, "coal": 1}, "furnace"),
+        R("medkit", {"bandage": 2, "crystal": 1}, "workbench"),
+    ],
+}
+RECIPES = [r for tab in CRAFT_TABS.values() for r in tab]
+
+STARTING_ITEMS = {"berries": 2, "water": 1}
+HOTBAR_SLOTS = 8
+
+# ----------------------------------------------------------------- resources in the world
+TREE_COUNT, ROCK_COUNT, BUSH_COUNT, POND_COUNT, IRON_COUNT = 230, 120, 95, 9, 18
+CAVE_ROCKS, CAVE_IRON, CAVE_COAL, CAVE_CRYSTAL = 40, 34, 30, 16
+TREE_HP, ROCK_HP = 6, 6
+TREE_REGROW, ROCK_REGROW, BERRY_REGROW = 90, 120, 45
